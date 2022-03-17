@@ -1,0 +1,72 @@
+use HW_6310545418
+'switched to db HW_6310545418'
+db.createCollection("Students")
+{ ok: 1 }
+db.Students.insertMany([{"name":"Ramesh","subject":"maths","marks":87}, {"name":"Ramesh","subject":"english","marks":59}, {"name":"Ramesh","subject":"science","marks":77}])
+{ acknowledged: true,
+  insertedIds: 
+   { '0': ObjectId("6232a236c0139692ba268e72"),
+     '1': ObjectId("6232a236c0139692ba268e73"),
+     '2': ObjectId("6232a236c0139692ba268e74") } }
+db.Students.insertMany([{"name":"Rav","subject":"maths","marks":62}, {"name":"Rav","subject":"english","marks":83}, {"name":"Rav","subject":"science","marks":71}])
+{ acknowledged: true,
+  insertedIds: 
+   { '0': ObjectId("6232a26bc0139692ba268e75"),
+     '1': ObjectId("6232a26bc0139692ba268e76"),
+     '2': ObjectId("6232a26bc0139692ba268e77") } }
+db.Students.insertMany([{"name":"Alison","subject":"maths","marks":84}, {"name":"Alison","subject":"english","marks":82}, {"name":"Alison","subject":"science","marks":86}])
+{ acknowledged: true,
+  insertedIds: 
+   { '0': ObjectId("6232a296c0139692ba268e78"),
+     '1': ObjectId("6232a296c0139692ba268e79"),
+     '2': ObjectId("6232a296c0139692ba268e7a") } }
+db.Students.insertMany([{"name":"Steve","subject":"maths","marks":81}, {"name":"Steve","subject":"english","marks":89}, {"name":"Steve","subject":"science","marks":77}])
+{ acknowledged: true,
+  insertedIds: 
+   { '0': ObjectId("6232a2c9c0139692ba268e7b"),
+     '1': ObjectId("6232a2c9c0139692ba268e7c"),
+     '2': ObjectId("6232a2c9c0139692ba268e7d") } }
+db.Students.insertOne({"name":"Jan","subject":"english","marks":0,"reason":"absent"})
+{ acknowledged: true,
+  insertedId: ObjectId("6232a2e1c0139692ba268e7e") }
+db.Students.aggregate([{$group: {_id: "$name", "total_marks": {"$sum": "$marks"}}])
+SyntaxError: Unexpected token, expected "," (1:81)
+
+> 1 | db.Students.aggregate([{$group: {_id: "$name", "total_marks": {"$sum": "$marks"}}])
+    |                                                                                  ^
+db.Students.aggregate([{$group: {"_id": "$name", "total_marks": {"$sum": "$marks"}}])
+SyntaxError: Unexpected token, expected "," (1:83)
+
+> 1 | db.Students.aggregate([{$group: {"_id": "$name", "total_marks": {"$sum": "$marks"}}])
+    |                                                                                    ^
+db.Students.aggregate([{$group: {_id: "$name", "total_marks": {"$sum": "$marks"}}}])
+{ _id: 'Rav', total_marks: 216 }
+{ _id: 'Alison', total_marks: 252 }
+{ _id: 'Ramesh', total_marks: 223 }
+{ _id: 'Steve', total_marks: 247 }
+{ _id: 'Jan', total_marks: 0 }
+db.Students.aggregate([{$group: {_id: "$subject", "max_score": {"$max": "$marks"}}}])
+{ _id: 'english', max_score: 89 }
+{ _id: 'science', max_score: 86 }
+{ _id: 'maths', max_score: 87 }
+db.Students.aggregate([{$group: {_id: "$name", "min_score": {"$min": "$marks"}}}])
+{ _id: 'Alison', min_score: 82 }
+{ _id: 'Steve', min_score: 77 }
+{ _id: 'Jan', min_score: 0 }
+{ _id: 'Ramesh', min_score: 59 }
+{ _id: 'Rav', min_score: 62 }
+db.Students.aggregate([{$group: {_id: "$name", "average_score": {"$avg": "$marks"}}}, {$sort: {average_score: 1}}])
+{ _id: 'Jan', average_score: 0 }
+{ _id: 'Rav', average_score: 72 }
+{ _id: 'Ramesh', average_score: 74.33333333333333 }
+{ _id: 'Steve', average_score: 82.33333333333333 }
+{ _id: 'Alison', average_score: 84 }
+db.Students.aggregate([{$group: {_id: "$subject", "average_score": {"$avg": "$marks"}}}, {$sort: {average_score: -1}}])
+{ _id: 'maths', average_score: 78.5 }
+{ _id: 'science', average_score: 77.75 }
+{ _id: 'english', average_score: 62.6 }
+db.Students.aggregate([{$group: {_id: "$subject", "average_score": {"$avg": "$marks"}}}, {$sort: {average_score: -1}}, {$slice: [0, 2]}])
+MongoServerError: Unrecognized pipeline stage name: '$slice'
+db.Students.aggregate([{$group: {_id: "$subject", "average_score": {"$avg": "$marks"}}}, {$sort: {average_score: -1}}, {$limit: 2}])
+{ _id: 'maths', average_score: 78.5 }
+{ _id: 'science', average_score: 77.75 }
